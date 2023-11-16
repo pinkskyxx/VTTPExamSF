@@ -1,8 +1,8 @@
+//tasktwo.java 
 package sdf.mytaskTwo;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.InputStream;
@@ -13,7 +13,6 @@ import java.io.Writer;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale.Category;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -164,6 +163,7 @@ public class tasktwo {
 
         try (FileReader fr = new FileReader(fname)) {
             BufferedReader br1 = new BufferedReader(fr);
+
             Items_receive = br1.lines()
 
                     .map(row -> row.trim().split(","))
@@ -174,6 +174,7 @@ public class tasktwo {
                     .collect(Collectors.groupingBy(Category -> Category.getProd_id()));
         }
 
+        System.out.println("Size of items: " + Items_receive.size());
         is.close();
         os.close();
         socket.close();
