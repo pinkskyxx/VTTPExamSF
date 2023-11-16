@@ -1,4 +1,3 @@
-//tasktwo.java 
 package sdf.mytaskTwo;
 
 import java.io.BufferedReader;
