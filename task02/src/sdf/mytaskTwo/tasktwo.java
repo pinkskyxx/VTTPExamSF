@@ -53,7 +53,7 @@ public class tasktwo {
                 }
                 break;
             case 2:
-
+                // cookieFile = args[0];
                 Server_Name = args[0];
                 boolean chk1 = isNumeric(args[1]);
                 if (chk1 == true) {
@@ -116,7 +116,8 @@ public class tasktwo {
         try (Writer fileWriter = new FileWriter(fname, false)) {
             fileWriter.append("");
         }
-        for (int i = 0; i < item_count; i++) {
+        int total_collect = 0;
+        while (receiveing) {
             String line = br.readLine();
             System.out.println(line);
 
@@ -125,6 +126,7 @@ public class tasktwo {
 
             switch (terms[0]) {
                 case "prod_start":
+                    total_collect++;
                     started = true;
                     break;
                 case "prod_id":
@@ -144,9 +146,10 @@ public class tasktwo {
                 case "prod_end":
 
                     if (started == true) {
-
+                        if (total_collect >= item_count)
+                            receiveing = false;
                         try (Writer fileWriter = new FileWriter(fname, true)) {
-                            fileWriter.append(prod_id + "," + title + "," + price + "," + rating);
+                            fileWriter.append(prod_id + "," + title + "," + price + "," + rating + ",");
                             fileWriter.append(System.getProperty("line.separator"));
                         }
                     }
@@ -159,7 +162,7 @@ public class tasktwo {
             }
         }
         System.out.println("Preparing ");
-
+        // Preparing items list
         try (FileReader fr = new FileReader(fname)) {
             BufferedReader br1 = new BufferedReader(fr);
 
@@ -174,6 +177,18 @@ public class tasktwo {
         }
 
         System.out.println("Size of items: " + Items_receive.size());
+        System.out.println();
+        for (Integer items_ID : Items_receive.keySet()) {
+            List<Items> aa = Items_receive.get(items_ID);
+            for (Items its : aa) {
+                System.out.println(items_ID + " ID : " + its.getProd_id());
+                System.out.println(items_ID + " Title: " + its.getTitle());
+                System.out.println(items_ID + " Price: " + its.getPrice());
+                System.out.println(items_ID + " Rating: " + its.getRating());
+            }
+
+        }
+
         is.close();
         os.close();
         socket.close();
