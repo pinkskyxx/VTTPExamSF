@@ -3,10 +3,13 @@ package sdf.mytaskTwo;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,13 +28,7 @@ public class tasktwo {
         return pattern.matcher(strNum).matches();
     }
  
-    static Map<String, List<Items>> Items_receive;
-    // static List<Integer> my_prod_id;
-    // static List<Integer> my_prod_id;
-    // static List<Integer> my_prod_id;
-    // static List<Integer> my_prod_id;
- 
-    // private static Items my_new_items;
+    static Map<Integer, List<Items>> Items_receive;
  
     public static void main(String[] args) throws Exception {
         System.out.println("tasktwo");
@@ -74,7 +71,6 @@ public class tasktwo {
             default:
                 System.err.println("Argument error");
                 System.exit(1);
-		break;
         } // end switch
  
         Socket socket = new Socket(Server_Name, port);
@@ -128,11 +124,15 @@ public class tasktwo {
  
         receiveing = true;
         boolean started = false;
-        int prod_id;
-        String title;
-        float price;
-        float rating;
-        while (receiveing) {
+        String prod_id = "";
+        String title = "";
+        String price = "";
+        String rating = "";
+        String fname = "myItems.db";
+        try (Writer fileWriter = new FileWriter(fname, false)) {
+            fileWriter.append("");
+        }
+        for(int i=0; i<item_count; i++) {
             String line = br.readLine();
             System.out.println(line);
  
@@ -149,36 +149,51 @@ public class tasktwo {
                     started = true;
                     break;
                 case "prod_id":
-                    prod_id = Integer.parseInt(terms[1]);
+                    prod_id = terms[1];
                     break;
  
                 case "title":
                     title = terms[1];
                     break;
                 case "price":
-                    price = Float.parseFloat(terms[1]);
+                    price = terms[1];
                     break;
                 case "rating":
-                    rating = Float.parseFloat(terms[1]);
+                    rating = terms[1];
                     break;
  
                 case "prod_end":
  
-                    // if (started == true) {
-                    // }
-                    
-                    //Items_receiveA.put(prod_id,nn);
-                        started = false;
+                    if (started == true) {
+ 
+                        try (Writer fileWriter = new FileWriter(fname, true)) {
+                            fileWriter.append(prod_id + "," + title + "," + price + "," + rating);
+                            fileWriter.append(System.getProperty("line.separator"));
+                        }
+                    }
+                    started = false;
                     break;
                 default:
+                System.out.println("end of items list");
+                receiveing=false;
                     break;
             }
         }
- 
-        for (int i = 0; i < 200; i++) {
-            String line = br.readLine();
-            System.out.println(line);
+        System.out.println("Preparing ");
+        //Preparing items list
+        try (FileReader fr = new FileReader(fname)) {
+            BufferedReader br1 = new BufferedReader(fr);
+            // System.err.println(br.readLine());
+            Items_receive = br1.lines()
+                    // String -> String[]
+                    .map(row -> row.trim().split(","))
+                    // String[] -> Book
+                    .map(fields -> new Items(Integer.parseInt(fields[0]), fields[1],Float.parseFloat(fields[2]),Float.parseFloat(fields[3])))
+                    // groupingBy -> returns a value that classifies the input
+                    .collect(Collectors.groupingBy(Category -> Category.getProd_id()));
         }
+ 
+        
         is.close();
         os.close();
         socket.close();
